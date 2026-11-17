@@ -57,12 +57,73 @@ birthday_summary |>
 Conclusion: The probability of at least two people sharing a birthday increases rapidly as group size increases. The probability is about 0.5 when the group size is around 23 and increases to about 0.97 when the group size reaches 50.
 
 
-## Including Plots
 
-You can also embed plots, for example:
+## Problem 2
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Created a dataframe containing the file names for all participants.
+
+```{r, message=FALSE}
+longitudinal_df = 
+  tibble(
+    files = list.files("data/"),
+    path = str_c("data/", files)
+  ) |> 
+  mutate(data = map(path, read_csv)) |> 
+  unnest(data)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Tidied the data by extracting treatment group and subject ID from the file names and converting the weekly observations from wide to long format.
+
+```{r}
+tidy_df =
+  longitudinal_df |>
+  mutate(
+    files = str_replace(files, ".csv", ""),
+    group = str_sub(files, 1, 3)
+  ) |>
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    values_to = "outcome",
+    names_prefix = "week_"
+  ) |>
+  mutate(
+    week = as.numeric(week),
+    group = case_match(
+    group,
+    "con" ~ "Control",
+    "exp" ~ "Experimental"
+  )
+  ) |> 
+  select(group, subj = files, week, outcome)
+```
+
+Then created a spaghetti plot to show observations on each subject over time.
+
+```{r}
+tidy_df |>
+  ggplot(aes(x = week, y = outcome, group = subj, color = group)) +
+  geom_point() +
+  geom_path() +
+  facet_grid(~group) +
+  labs(
+    x = "Week",
+    y = "Outcome",
+    title = "Participant Outcomes Over Time"
+  )
+```
+
+The control group shows relatively little overall change across the eight weeks. In contrast, participants in the experimental group generally show increasing outcome values over time.
+
+
+
+
+
+
+
+
+
+
+
+
+
