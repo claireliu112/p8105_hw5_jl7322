@@ -243,6 +243,7 @@ rejected_estimates |>
     title = "Average Estimated Mean Among Rejected Tests"
   )
 ```
+
 ##### Conclusion
 
 The average estimated mean across all simulations is approximately equal to the true mean. However, among simulations where the null hypothesis is rejected, the average estimate is larger than the true mean for smaller effect sizes because only more extreme estimates are likely to produce significant results. As the true mean increases and power approaches 1, this difference becomes much smaller.
